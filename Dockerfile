@@ -1,5 +1,5 @@
 # Stage 1: Build the Nest.js application
-FROM node:20-alpine AS builder
+FROM node:23-alpine AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build:prod
 
 # Stage 2: Run the application with a minimal image
-FROM node:20-alpine AS runner
+FROM node:23-alpine AS runner
 
 # Set environment variables
 ENV NODE_ENV=production
