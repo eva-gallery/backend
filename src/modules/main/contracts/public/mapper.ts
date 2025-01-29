@@ -128,11 +128,11 @@ export function createExhibitionDto(exhibition: Exhibition): ExhibitionDto {
     fromDate: exhibition.fromDate?.toISOString() ?? null,
     toDate: exhibition.toDate?.toISOString() ?? null,
     curator: exhibition.curator,
-    gallery: exhibition.gallery ? {
+    gallery: exhibition.gallery != null ? {
       name: exhibition.gallery.name,
       slug: exhibition.gallery.slug,
     } : null,
-    artwork: artwork ? {
+    artwork: artwork != null ? {
       name: artwork.name,
       slug: artwork.slug,
     } : null,

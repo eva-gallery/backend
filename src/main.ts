@@ -22,7 +22,7 @@ async function bootstrap() {
     logger.error('Uncaught Exception:', err);
   });
 
-  process.on('unhandledRejection', (reason, promise) => {
+  process.on('unhandledRejection', (reason) => {
     logger.error('Unhandled Rejection:', reason);
   });
 
