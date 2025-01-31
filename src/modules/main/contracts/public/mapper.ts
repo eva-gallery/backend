@@ -73,13 +73,13 @@ export function createArtworkDetailDto(artwork: Artwork): ArtworkDetailDto {
       slug: artwork.artist.slug,
     },
     year: artwork.year,
-    nft: artwork.nft !== null ? mapEmpty(artwork.nft, nft => ({
-      nftData: nft.nftData !== null ? mapEmpty(nft.nftData, nftData => ({
+    nft: artwork.nft ? mapEmpty(artwork.nft, nft => ({
+      nftData: nft.nftData ? mapEmpty(nft.nftData, nftData => ({
         name: nftData.name,
         image: nftData.image,
       })) : null,
-      collection: nft.collection !== null ? mapEmpty(nft.collection, col => ({
-        colData: col.colData !== null ? mapEmpty(col.colData, colData => ({
+      collection: nft.collection ? mapEmpty(nft.collection, col => ({
+        colData: col.colData ? mapEmpty(col.colData, colData => ({
           name: colData.name,
           image: colData.image,
         })) : null
