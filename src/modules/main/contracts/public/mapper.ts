@@ -122,17 +122,17 @@ export function createGalleryDetailDto(gallery: Gallery): GalleryDetailDto {
 }
 
 export function createExhibitionDto(exhibition: Exhibition): ExhibitionDto {
-  const artwork = exhibition.artworks[0];
+  const artwork = exhibition.artworks?.[0] ?? null;
   return {
     name: exhibition.name,
     fromDate: exhibition.fromDate?.toISOString() ?? null,
     toDate: exhibition.toDate?.toISOString() ?? null,
     curator: exhibition.curator,
-    gallery: exhibition.gallery != null ? {
+    gallery: exhibition.gallery !== null && exhibition.gallery !== undefined ? {
       name: exhibition.gallery.name,
       slug: exhibition.gallery.slug,
     } : null,
-    artwork: artwork != null ? {
+    artwork: artwork !== null && artwork !== undefined ? {
       name: artwork.name,
       slug: artwork.slug,
     } : null,
