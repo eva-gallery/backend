@@ -73,13 +73,13 @@ export function createArtworkDetailDto(artwork: Artwork): ArtworkDetailDto {
       slug: artwork.artist.slug,
     },
     year: artwork.year,
-    nft: artwork.nft !== null ? mapEmpty(artwork.nft, nft => ({
-      nftData: nft.nftData !== null ? mapEmpty(nft.nftData, nftData => ({
+    nft: artwork.nft ? mapEmpty(artwork.nft, nft => ({
+      nftData: nft.nftData ? mapEmpty(nft.nftData, nftData => ({
         name: nftData.name,
         image: nftData.image,
       })) : null,
-      collection: nft.collection !== null ? mapEmpty(nft.collection, col => ({
-        colData: col.colData !== null ? mapEmpty(col.colData, colData => ({
+      collection: nft.collection ? mapEmpty(nft.collection, col => ({
+        colData: col.colData ? mapEmpty(col.colData, colData => ({
           name: colData.name,
           image: colData.image,
         })) : null
@@ -128,11 +128,11 @@ export function createExhibitionDto(exhibition: Exhibition): ExhibitionDto {
     fromDate: exhibition.fromDate?.toISOString() ?? null,
     toDate: exhibition.toDate?.toISOString() ?? null,
     curator: exhibition.curator,
-    gallery: exhibition.gallery !== null && exhibition.gallery !== undefined ? {
+    gallery: exhibition.gallery ? {
       name: exhibition.gallery.name,
       slug: exhibition.gallery.slug,
     } : null,
-    artwork: artwork !== null && artwork !== undefined ? {
+    artwork: artwork ? {
       name: artwork.name,
       slug: artwork.slug,
     } : null,
