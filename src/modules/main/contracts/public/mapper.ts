@@ -16,7 +16,7 @@ import {
 export { createDesignerRoomDto, createDesignerLibraryItemDto } from '../admin/read';
 
 export function createArtistDto(artist: Artist): ArtistDto {
-  const artwork = artist.artworks[0];
+  const artwork = artist.artworks.length > 0 ? artist.artworks[0] : null;
   return {
     name: artist.name,
     born: artist.born,
@@ -24,13 +24,13 @@ export function createArtistDto(artist: Artist): ArtistDto {
     countryCode: artist.country.code,
     artistCategory: artist.artistCategory?.name,
     slug: artist.slug,
-    artwork: {
+    artwork: artwork ? {
       name: artwork.name,
       description: artwork.description,
       artistName: artwork.artist.name,
       year: artwork.year,
       slug: artwork.slug,
-    }
+    } : null
   };
 }
 
@@ -73,7 +73,7 @@ export function createArtworkDetailDto(artwork: Artwork): ArtworkDetailDto {
       slug: artwork.artist.slug,
     },
     year: artwork.year,
-    nft: mapEmpty(artwork.nft, nft => ({
+    nft: artwork.nft ? mapEmpty(artwork.nft, nft => ({
       nftData: mapEmpty(nft.nftData, nftData => ({
         name: nftData.name,
         image: nftData.image,
@@ -84,7 +84,7 @@ export function createArtworkDetailDto(artwork: Artwork): ArtworkDetailDto {
           image: colData.image,
         }))
       }))
-    })),
+    })) : null,
     ai: artwork.ai,
     tags: artwork.tags,
     artworkGenre: artwork.artworkGenre?.name,
