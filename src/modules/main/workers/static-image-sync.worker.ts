@@ -95,6 +95,7 @@ async function run() {
   }
   async function syncImages() {
     console.time("sync");
+    logger.log("Starting image synchronization");
     await adminRepository.updateArtworkImageHashes();
     const artworks = await adminRepository.getArtworkImageHashes();
     const imageDir = join(config.staticFileRoot, "image");
@@ -102,20 +103,34 @@ async function run() {
     const hashSet = new Set(artworks.map(a => a.imageHash));
     const existingImages = removeOldFiles(imageDir, hashSet);
     const existingThumbnails = removeOldFiles(thumbnailDir, hashSet);
+    let processedImages = 0;
     for (const artwork of artworks) {
       let wait = false;
       if (!existingImages.has(artwork.imageHash)) {
-        storeImage(imageDir, artwork, imageGetter);
+        try {
+          storeImage(imageDir, artwork, imageGetter);
+          processedImages++;
+          logger.log(`Stored image for artwork ID ${artwork.id}`);
+        } catch (error) {
+          logger.error(`Error storing image for artwork ID ${artwork.id}: ${error.message}`);
+        }
         wait = true;
       }
       if (!existingThumbnails.has(artwork.imageHash)) {
-        storeImage(thumbnailDir, artwork, thumbnailGetter);
+        try {
+          storeImage(thumbnailDir, artwork, thumbnailGetter);
+          processedImages++;
+          logger.log(`Stored thumbnail for artwork ID ${artwork.id}`);
+        } catch (error) {
+          logger.error(`Error storing thumbnail for artwork ID ${artwork.id}: ${error.message}`);
+        }
         wait = true;
       }
       if (wait) {
         await sleep(sleepInterval);
       }
     }
+    logger.log(`Finished image synchronization. Total images processed: ${processedImages}`);
     console.timeEnd("sync");
   }
   messages.pipe(startWith<Message>({ type: "ResyncImageMessage" }), filter(msg => msg.type === "ResyncImageMessage"), delayExecution(async () => {

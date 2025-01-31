@@ -11,6 +11,8 @@ export class LogRequestMiddleware implements NestMiddleware {
     res.on('close', () => {
       const duration = Date.now() - start;
       this.logger.log(`${req.method} ${req.path} ${res.statusCode} ${duration}ms`);
+      this.logger.log(`Request Body: ${JSON.stringify(req.body)}`);
+      this.logger.log(`Response Status: ${res.statusCode}`);
     });
     next();
   }

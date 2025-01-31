@@ -1,4 +1,4 @@
-import { Controller, Post, Put, Patch, Delete, Param, NotFoundException, BadRequestException, ParseUUIDPipe, UseGuards, Body } from '@nestjs/common';
+import { Controller, Post, Put, Patch, Delete, Param, NotFoundException, BadRequestException, ParseUUIDPipe, UseGuards, Body, Logger } from '@nestjs/common';
 import { FormDataRequest } from 'nestjs-form-data';
 import { Image, ArtworkImage, UserId, ArtistId, ArtworkId, GalleryId, ExhibitionId, UnityRoomId, ResourceId } from '@modules/app-db/entities';
 import { AdminRepository } from '@modules/app-db/repositories';
@@ -16,6 +16,8 @@ import { randomUUID } from 'crypto';
 @UseGuards(SessionAuthGuard)
 @Controller('admin')
 export class AdminWriteController {
+
+  private readonly logger = new Logger(AdminWriteController.name);
 
   constructor(private adminRepository: AdminRepository, private httpApi: HttpApiService) {
   }
@@ -74,6 +76,7 @@ export class AdminWriteController {
   @Post('artwork/create')
   @FormDataRequest()
   async createArtwork(@Body() dto: CreateArtworkDto, @GetUserId() userId: UserId) {
+    this.logger.log(`Starting artwork creation for artist ID ${dto.artistId}`);
     if (!await this.adminRepository.hasArtist(userId, dto.artistId))
       throw new BadRequestException("artist does not exist");
     if (dto.exhibitions != null && dto.exhibitions !== "" && !await this.adminRepository.hasExhibitions(userId, dto.exhibitions))
@@ -98,12 +101,14 @@ export class AdminWriteController {
       image: mapEmpty(dto.image, image => ({ id: randomUUID(), buffer: image.buffer, mimeType: image.mimeType }), ArtworkImage.empty),
       protectedImage: (dto.image !== undefined) ? ArtworkImage.empty : undefined,
     });
+    this.logger.log(`Finished artwork creation for artist ID ${dto.artistId}, artwork ID ${artwork.id}`);
     return { id: artwork.id };
   }
 
   @Post('artwork/nft/create')
   @FormDataRequest()
   async createArtworkFromNft(@Body() dto: CreateArtworNFTDto, @GetUserId() userId: UserId) {
+    this.logger.log(`Starting artwork creation from NFT for artist ID ${dto.artistId}`);
     if (!await this.adminRepository.hasArtist(userId, dto.artistId))
       throw new BadRequestException("artist does not exist");
     if (await this.adminRepository.getArtworkByName(dto.artistId, dto.name) != null)
@@ -138,6 +143,7 @@ export class AdminWriteController {
         artworkDb.image.mimeType = image.mimeType as MimeType;
         await this.adminRepository.saveArtwork(artworkDb);
 
+        this.logger.log(`Finished artwork creation from NFT for artist ID ${dto.artistId}, artwork ID ${artworkDb.id}`);
         return { id: artworkDb.id };
       }
       else {
@@ -149,6 +155,7 @@ export class AdminWriteController {
   @Patch('artwork/update/:id')
   @FormDataRequest()
   async updateArtwork(@Param('id', ParseUUIDPipe) id: ArtworkId, @Body() dto: UpdateArtworkDto, @GetUserId() userId: UserId) {
+    this.logger.log(`Starting artwork update for artwork ID ${id}`);
     const artwork = await this.adminRepository.getArtwork(userId, id);
     if (artwork == null)
       throw new NotFoundException();
@@ -185,13 +192,16 @@ export class AdminWriteController {
         protectedImage: ArtworkImage.empty,
       });
     }
+    this.logger.log(`Finished artwork update for artwork ID ${id}`);
   }
 
   @Delete('artwork/delete/:id')
   async deleteArtwork(@Param('id', ParseUUIDPipe) id: ArtworkId, @GetUserId() userId: UserId) {
+    this.logger.log(`Starting artwork deletion for artwork ID ${id}`);
     if (!await this.adminRepository.hasArtwork(userId, id))
       throw new NotFoundException();
     await this.adminRepository.removeArtwork(id);
+    this.logger.log(`Finished artwork deletion for artwork ID ${id}`);
   }
 
   @Post('gallery/create')
