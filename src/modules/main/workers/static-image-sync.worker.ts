@@ -108,7 +108,7 @@ async function run() {
       let wait = false;
       if (!existingImages.has(artwork.imageHash)) {
         try {
-          storeImage(imageDir, artwork, imageGetter);
+          await storeImage(imageDir, artwork, imageGetter);
           processedImages++;
           logger.log(`Stored image for artwork ID ${artwork.id}`);
         } catch (error) {
@@ -118,7 +118,7 @@ async function run() {
       }
       if (!existingThumbnails.has(artwork.imageHash)) {
         try {
-          storeImage(thumbnailDir, artwork, thumbnailGetter);
+          await storeImage(thumbnailDir, artwork, thumbnailGetter);
           processedImages++;
           logger.log(`Stored thumbnail for artwork ID ${artwork.id}`);
         } catch (error) {
@@ -134,7 +134,12 @@ async function run() {
     console.timeEnd("sync");
   }
   messages.pipe(startWith<Message>({ type: "ResyncImageMessage" }), filter(msg => msg.type === "ResyncImageMessage"), delayExecution(async () => {
-    await syncImages();
+    try {
+      await syncImages();
+    }
+    catch(ex) {
+      logger.error(ex, ex.stack);
+    }
   })).subscribe();
 }
 
