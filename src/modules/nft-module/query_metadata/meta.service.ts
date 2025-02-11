@@ -33,6 +33,9 @@ export class MetaFetcher {
         if (data[i].image != null) {
           data[i].image = this.nftConfigService.convertIpfsLink(data[i].image);
         }
+        else if (data[i].image == null) {
+          data[i].image = this.nftConfigService.convertIpfsLink(newData.image);
+        }
         if (data[i].name == null) {
           data[i].name = newData.name
         }
