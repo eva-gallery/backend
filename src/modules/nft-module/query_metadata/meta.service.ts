@@ -62,10 +62,9 @@ export class MetaFetcher {
         const fetchedData = await this.nftConfigService.fetchMetadataFromIPFS(data[i].metadata);
         const newData = typeof fetchedData === 'string' ? JSON.parse(fetchedData) : fetchedData;
         if (data[i].image != null) {
-
           data[i].image = this.nftConfigService.convertIpfsLink(data[i].image);
         }
-        else if (data[i].image == null) {
+        else if (data[i].image == null && newData.image != null) {
           data[i].image = this.nftConfigService.convertIpfsLink(newData.image);
         }
         if (data[i].name == null) {
