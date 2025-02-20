@@ -30,6 +30,8 @@ export function createArtistDto(artist: Artist): ArtistDto {
       artistName: artwork.artist.name,
       year: artwork.year,
       slug: artwork.slug,
+      imageFilename: artwork.imageFilename,
+      thumbnailFilename: artwork.thumbnailFilename,
     } : null
   };
 }

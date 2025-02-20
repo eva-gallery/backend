@@ -4,6 +4,8 @@ export interface ArtistArtworkDto {
   artistName: string;
   year: string;
   slug: string;
+  imageFilename: string;
+  thumbnailFilename: string;
 }
 
 export interface ArtistDto {
