@@ -52,11 +52,19 @@ export class PublicRepository {
         .limit(count);
       const items = await query.getRawAndEntities();
       const res = items.entities.map((artist, i) => {
-        const artwork = deserializeEntity(mgr, Artwork, items.raw[i]);
-        artwork.artist = artist;
+        const rawArtwork = deserializeEntity(mgr, Artwork, items.raw[i]);
+        // Create a new object with the computed properties
+        const artwork = {
+          ...rawArtwork,
+          artist,
+          get imageFilename() { 
+            return `${this.imageHash}.${getExtensionForMimeType(this.image.mimeType)}`;
+          },
+          get thumbnailFilename() {
+            return `${this.imageHash}.${getExtensionForMimeType(this.thumbnail.mimeType)}`;
+          }
+        };
         artist.artworks = [artwork];
-        artwork.imageFilename = `${artwork.imageHash}.${getExtensionForMimeType(artwork.image.mimeType)}`;
-        artwork.thumbnailFilename = `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail.mimeType)}`;
         return artist;
       });
       return res;
