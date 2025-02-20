@@ -56,10 +56,10 @@ export class PublicRepository {
         // Create a temporary object that includes needed methods
         const computedProps = {
           get imageFilename() { 
-            return `${artwork.imageHash}.${getExtensionForMimeType(artwork.image.mimeType)}`;
+            return `${artwork.imageHash}.${getExtensionForMimeType(artwork.image?.mimeType)}`;
           },
           get thumbnailFilename() {
-            return `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail.mimeType)}`;
+            return `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail?.mimeType)}`;
           }
         };
         // Assign computed properties to the artwork instance
