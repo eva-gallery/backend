@@ -30,7 +30,7 @@ export class PublicRepository {
     return this.artists.manager.transaction(async mgr => {
       await mgr.query(`SELECT setseed(${nseed})`);
       const subQuery = mgr.getRepository(Artwork).createQueryBuilder("artwork")
-        .select(["artwork.id", "artwork.name", "artwork.label", "artwork.artist_id"])
+        .select(["artwork.id", "artwork.name", "artwork.label", "artwork.artist_id", "artwork.imageFilename", "artwork.thumbnailFilename"])
         .where("artwork.public = true")
         .andWhere("artwork.artist_id = artist.id")
         .orderBy("random()")
