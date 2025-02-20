@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeepPartial } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { deserializeEntity } from '@common/helpers';
+import { getExtensionForMimeType } from '@common/helpers';
 import {
   Artist, Artwork, Gallery, Exhibition, Nft, Resource, UnityRoom, UnityItemType,
   ArtworkId, ResourceId, UnityRoomId,
@@ -24,13 +25,13 @@ export class PublicRepository {
     @InjectRepository(UnityItemType) private unityItemTypes: Repository<UnityItemType>,
     @InjectRepository(Resource) private resources: Repository<Resource>,
   ) { }
-
+  
   async getRandomArtists(seed: number, from: number = 0, count: number = 1) {
     const nseed = seed / MAX_SEED;
     return this.artists.manager.transaction(async mgr => {
       await mgr.query(`SELECT setseed(${nseed})`);
       const subQuery = mgr.getRepository(Artwork).createQueryBuilder("artwork")
-        .select(["artwork.id", "artwork.name", "artwork.label", "artwork.artist_id", "artwork.imageFilename", "artwork.thumbnailFilename"])
+        .select(["artwork.id", "artwork.name", "artwork.label", "artwork.artist_id", "artwork.image_hash", "artwork.image_mime_type", "artwork.thumbnail_mime_type"])
         .where("artwork.public = true")
         .andWhere("artwork.artist_id = artist.id")
         .orderBy("random()")
@@ -52,6 +53,17 @@ export class PublicRepository {
       const items = await query.getRawAndEntities();
       const res = items.entities.map((artist, i) => {
         const artwork = deserializeEntity(mgr, Artwork, items.raw[i]);
+        // Create a temporary object that includes needed methods
+        const computedProps = {
+          get imageFilename() { 
+            return `${artwork.imageHash}.${getExtensionForMimeType(artwork.image.mimeType)}`;
+          },
+          get thumbnailFilename() {
+            return `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail.mimeType)}`;
+          }
+        };
+        // Assign computed properties to the artwork instance
+        Object.defineProperties(artwork, Object.getOwnPropertyDescriptors(computedProps));
         artwork.artist = artist;
         artist.artworks = [artwork];
         return artist;
