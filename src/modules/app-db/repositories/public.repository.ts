@@ -52,18 +52,19 @@ export class PublicRepository {
         .limit(count);
       const items = await query.getRawAndEntities();
       const res = items.entities.map((artist, i) => {
-        const rawArtwork = deserializeEntity(mgr, Artwork, items.raw[i]);
-        // Create a new object with the computed properties
-        const artwork = {
-          ...rawArtwork,
-          artist,
+        const artwork = deserializeEntity(mgr, Artwork, items.raw[i]);
+        // Create a temporary object that includes needed methods
+        const computedProps = {
           get imageFilename() { 
-            return `${this.imageHash}.${getExtensionForMimeType(this.image.mimeType)}`;
+            return `${artwork.imageHash}.${getExtensionForMimeType(artwork.image.mimeType)}`;
           },
           get thumbnailFilename() {
-            return `${this.imageHash}.${getExtensionForMimeType(this.thumbnail.mimeType)}`;
+            return `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail.mimeType)}`;
           }
         };
+        // Assign computed properties to the artwork instance
+        Object.defineProperties(artwork, Object.getOwnPropertyDescriptors(computedProps));
+        artwork.artist = artist;
         artist.artworks = [artwork];
         return artist;
       });
