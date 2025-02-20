@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeepPartial } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { deserializeEntity } from '@common/helpers';
+import { getExtensionForMimeType } from '@common/helpers';
 import {
   Artist, Artwork, Gallery, Exhibition, Nft, Resource, UnityRoom, UnityItemType,
   ArtworkId, ResourceId, UnityRoomId,
@@ -24,13 +25,13 @@ export class PublicRepository {
     @InjectRepository(UnityItemType) private unityItemTypes: Repository<UnityItemType>,
     @InjectRepository(Resource) private resources: Repository<Resource>,
   ) { }
-
+  
   async getRandomArtists(seed: number, from: number = 0, count: number = 1) {
     const nseed = seed / MAX_SEED;
     return this.artists.manager.transaction(async mgr => {
       await mgr.query(`SELECT setseed(${nseed})`);
       const subQuery = mgr.getRepository(Artwork).createQueryBuilder("artwork")
-        .select(["artwork.id", "artwork.name", "artwork.label", "artwork.artist_id", "artwork.imageFilename", "artwork.thumbnailFilename"])
+        .select(["artwork.id", "artwork.name", "artwork.label", "artwork.artist_id", "artwork.image_hash", "artwork.image_mime_type", "artwork.thumbnail_mime_type"])
         .where("artwork.public = true")
         .andWhere("artwork.artist_id = artist.id")
         .orderBy("random()")
@@ -54,6 +55,8 @@ export class PublicRepository {
         const artwork = deserializeEntity(mgr, Artwork, items.raw[i]);
         artwork.artist = artist;
         artist.artworks = [artwork];
+        artwork.imageFilename = `${artwork.imageHash}.${getExtensionForMimeType(artwork.image.mimeType)}`;
+        artwork.thumbnailFilename = `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail.mimeType)}`;
         return artist;
       });
       return res;
