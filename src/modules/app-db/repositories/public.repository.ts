@@ -30,7 +30,7 @@ export class PublicRepository {
     return this.artists.manager.transaction(async mgr => {
       await mgr.query(`SELECT setseed(${nseed})`);
       const subQuery = mgr.getRepository(Artwork).createQueryBuilder("artwork")
-        .select(["artwork.id", "artwork.name", "artwork.label", "artwork.artist_id", "artwork.imageFilename", "artwork.thumbnailFilename"])
+        .select(["artwork.id", "artwork.name", "artwork.label", "artwork.artist_id", "artwork.imageHash", "artwork.image.mimeType", "artwork.thumbnail.mimeType"])
         .where("artwork.public = true")
         .andWhere("artwork.artist_id = artist.id")
         .orderBy("random()")
@@ -51,8 +51,11 @@ export class PublicRepository {
         .limit(count);
       const items = await query.getRawAndEntities();
       const res = items.entities.map((artist, i) => {
-        const artwork = deserializeEntity(mgr, Artwork, items.raw[i]);
+        const raw = items.raw[i];
+        const artwork = deserializeEntity(mgr, Artwork, items.raw);
         artwork.artist = artist;
+        artwork.imageFilename = `${raw.artwork_imageHash}.${getExtensionForMimeType(raw.artwork_image_mimeType)}`;
+        artwork.thumbnailFilename = `${raw.artwork_imageHash}.${getExtensionForMimeType(raw.artwork_thumbnail_mimeType)}`;
         artist.artworks = [artwork];
         return artist;
       });
