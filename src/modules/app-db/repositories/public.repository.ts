@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeepPartial } from 'typeorm';
 import { isUUID } from 'class-validator';
@@ -52,7 +52,7 @@ export class PublicRepository {
       const items = await query.getRawAndEntities();
       const res = items.entities.map((artist, i) => {
         const artwork = deserializeEntity(mgr, Artwork, items.raw[i]);
-        console.log('Raw artwork data:', items.raw[i]);
+        logger.debug('Raw artwork data:', items.raw[i]);
         // Create a temporary object that includes needed methods
         const computedProps = {
           get imageFilename() { 
