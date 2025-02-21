@@ -10,6 +10,7 @@ import { useContainer } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useLogger(['debug', 'error', 'warn', 'log']); // logger 
   const config = app.get(AppConfigService);
   app.enableCors((req: ExpressRequest, callback) => {
     const opt: CorsOptions = {
