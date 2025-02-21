@@ -14,6 +14,7 @@ export const MAX_SEED = 2 ** 32;
 
 @Injectable()
 export class PublicRepository {
+  private readonly logger = new Logger(PublicRepository.name);
 
   constructor(
     @InjectRepository(Artist) private artists: Repository<Artist>,
@@ -52,7 +53,7 @@ export class PublicRepository {
       const items = await query.getRawAndEntities();
       const res = items.entities.map((artist, i) => {
         const artwork = deserializeEntity(mgr, Artwork, items.raw[i]);
-        logger.debug('Raw artwork data:', items.raw[i]);
+        this.logger.debug('Raw artwork data:', items.raw[i]);
         // Create a temporary object that includes needed methods
         const computedProps = {
           get imageFilename() { 
