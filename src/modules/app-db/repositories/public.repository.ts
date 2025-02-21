@@ -36,7 +36,7 @@ export class PublicRepository {
         .orderBy("random()")
         .limit(1);
       const query = mgr.getRepository(Artist).createQueryBuilder("artist")
-        .select(["artist.name", "artist.label"])
+        .select(["artist.name", "artist.label", "artist.biography"])
         .innerJoin("artist.user", "user")
         .addSelect(["user.label"])
         .innerJoin("artist.country", "country")
