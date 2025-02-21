@@ -52,6 +52,7 @@ export class PublicRepository {
       const items = await query.getRawAndEntities();
       const res = items.entities.map((artist, i) => {
         const artwork = deserializeEntity(mgr, Artwork, items.raw[i]);
+        console.log('Raw artwork data:', items.raw[i]);
         // Create a temporary object that includes needed methods
         const computedProps = {
           get imageFilename() { 
