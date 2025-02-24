@@ -7,6 +7,10 @@ import { ID, createThumbnail } from '@common/helpers';
 
 export type GalleryId = ID<"Gallery">;
 
+export enum GalleryType {
+  Real = "Real",
+  Virtual = "Virtual"
+}
 @Entity()
 @Index(['name', 'userId'], { unique: true })
 @Index(['label', 'userId'], { unique: true })
@@ -46,6 +50,9 @@ export class Gallery extends LabeledEntity {
 
   @Column({ nullable: true })
   userId: UserId;
+
+  @Column({ type: 'enum', enum: GalleryType })
+  type: GalleryType;
 
   get slug() { return `${this.user.label}/${this.label}`; }
 

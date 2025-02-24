@@ -1,3 +1,5 @@
+import { GalleryType } from "@modules/app-db/entities";
+
 export interface GalleryDto {
   name: string;
   description: string;
@@ -5,4 +7,5 @@ export interface GalleryDto {
   countryCode: string;
   gps: string;
   slug: string;
+  type: GalleryType;
 }

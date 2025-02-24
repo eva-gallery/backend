@@ -110,6 +110,7 @@ export function createGalleryDto(gallery: Gallery): GalleryDto {
     countryCode: gallery.country.code,
     gps: gallery.gps,
     slug: gallery.slug,
+    type: gallery.type,
   };
 }
 
