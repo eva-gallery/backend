@@ -1,6 +1,6 @@
 {
   "name": "E.V.A. Gallery Backend",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "GPL-3.0",
   "scripts": {
     "build:dev": "cross-env NODE_ENV=development nest build",
