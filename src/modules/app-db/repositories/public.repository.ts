@@ -54,17 +54,15 @@ export class PublicRepository {
       const res = items.entities.map((artist, i) => {
         const artwork = deserializeEntity(mgr, Artwork, items.raw[i]);
         this.logger.debug('Raw artwork data:', items.raw[i]);
-        // Create a temporary object that includes needed methods
-        const computedProps = {
-          get imageFilename() { 
-            return `${artwork.imageHash}.${getExtensionForMimeType(artwork.image.mimeType)}`;
-          },
-          get thumbnailFilename() {
-            return `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail.mimeType)}`;
-          }
-        };
-        // Assign computed properties to the artwork instance
-        Object.defineProperties(artwork, Object.getOwnPropertyDescriptors(computedProps));
+
+        if (artwork.imageHash && artwork.image?.mimeType) {
+          artwork.imageFilename = `${artwork.imageHash}.${getExtensionForMimeType(artwork.image.mimeType)}`;
+          artwork.thumbnailFilename = `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail.mimeType)}`;
+        } else {
+          artwork.imageFilename = undefined;
+          artwork.thumbnailFilename = undefined;
+        }
+        
         artwork.artist = artist;
         artist.artworks = [artwork];
         return artist;
