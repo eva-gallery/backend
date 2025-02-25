@@ -55,16 +55,24 @@ export class PublicRepository {
         const artwork = deserializeEntity(mgr, Artwork, items.raw[i]);
         this.logger.debug('Raw artwork data:', items.raw[i]);
 
-        if (artwork.imageHash && artwork.image?.mimeType) {
-          artwork.imageFilename = `${artwork.imageHash}.${getExtensionForMimeType(artwork.image.mimeType)}`;
-          artwork.thumbnailFilename = `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail.mimeType)}`;
-        } else {
-          artwork.imageFilename = undefined;
-          artwork.thumbnailFilename = undefined;
-        }
+        // Store the original artwork object
+      const originalArtwork = artwork;
+      
+      // Create a new artwork object with the computed filename properties
+      const enhancedArtwork = {
+        ...originalArtwork,
+        // Add the filename properties explicitly
+        imageFilename: originalArtwork.imageHash ? 
+          `${originalArtwork.imageHash}.${getExtensionForMimeType(originalArtwork.image?.mimeType)}` : undefined,
+        thumbnailFilename: originalArtwork.imageHash ? 
+          `${originalArtwork.imageHash}.${getExtensionForMimeType(originalArtwork.thumbnail?.mimeType)}` : undefined
+      };
+      
+      // Replace the original artwork with our enhanced version
+      artist.artworks = [enhancedArtwork];
+      // Make sure the enhanced artwork has a reference to the artist
+      enhancedArtwork.artist = artist;  
         
-        artwork.artist = artist;
-        artist.artworks = [artwork];
         return artist;
       });
       return res;
