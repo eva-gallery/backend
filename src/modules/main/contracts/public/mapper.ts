@@ -9,6 +9,7 @@ import { ExhibitionDetailDto } from './exhibition-detail.dto';
 import { NftDto } from './nft.dto';
 import { NftDetailDto } from './nft-detail.dto';
 import { mapEmpty } from '@common/helpers';
+import { getExtensionForMimeType } from '@common/helpers';
 import {
   Artist, Artwork, Gallery, Exhibition, Nft
 } from '@modules/app-db/entities';
@@ -30,8 +31,10 @@ export function createArtistDto(artist: Artist): ArtistDto {
       artistName: artwork.artist.name,
       year: artwork.year,
       slug: artwork.slug,
-      imageFilename: artwork.imageFilename,
-      thumbnailFilename: artwork.thumbnailFilename,
+      imageFilename: artwork.imageHash ? 
+        `${artwork.imageHash}.${getExtensionForMimeType(artwork.image?.mimeType)}` : undefined,
+      thumbnailFilename: artwork.imageHash ? 
+        `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail?.mimeType)}` : undefined,
     } : null
   };
 }
