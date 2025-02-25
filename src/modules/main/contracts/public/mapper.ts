@@ -32,9 +32,9 @@ export function createArtistDto(artist: Artist): ArtistDto {
       year: artwork.year,
       slug: artwork.slug,
       imageFilename: artwork.imageHash ? 
-        `${artwork.imageHash}.${getExtensionForMimeType(artwork.image?.mimeType)}` : undefined,
+        `${artwork.imageHash}.${artwork.image?.mimeType ? getExtensionForMimeType(artwork.image.mimeType) || 'jpg' : 'jpg'}` : undefined,
       thumbnailFilename: artwork.imageHash ? 
-        `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail?.mimeType)}` : undefined,
+        `${artwork.imageHash}.${artwork.thumbnail?.mimeType ? getExtensionForMimeType(artwork.thumbnail.mimeType) || 'jpg' : 'jpg'}` : undefined,
     } : null
   };
 }
