@@ -156,7 +156,7 @@ async getDesignerRoomArtworks(@Param('id', ParseUUIDPipe) id: UnityRoomId) {
     throw new NotFoundException();
   const artworks = await this.publicRepository.getExhibitionArtworks(info.exhibition.id);
   // Map directly without using mapAsync
-  return artworks.map(artwork => mapper.createDesignerArtworkDto(artwork, info.exhibition));
+  return artworks.map(artwork => mapper.createPublicDesignerArtworkDto(artwork, info.exhibition));
 }
 
   @Get('designer/library')
