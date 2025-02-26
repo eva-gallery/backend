@@ -363,7 +363,7 @@ export class PublicRepository {
       select: { data: true, mimeType: true },
       where: {
         id: id,
-        public: true,
+        // public: true,
       }
     });
   }
