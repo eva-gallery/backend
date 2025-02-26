@@ -196,25 +196,35 @@ export function createNftDetailDto(nft: Nft): NftDetailDto {
 }
 
 export function createPublicDesignerArtworkDto(artwork: Artwork, exhibition: Exhibition): DesignerArtworkDto {
+  // Add null checks to prevent undefined errors
+  const artistName = artwork.artist?.name ?? 'Unknown Artist';
+  const userLabel = artwork.artist?.user?.label ?? 'unknown-user';
+  const artistLabel = artwork.artist?.label ?? 'unknown-artist';
+  const artworkLabel = artwork.label ?? 'unknown-artwork';
+
+  const galleryUserLabel = exhibition.gallery?.user?.label ?? 'unknown-user';
+  const galleryLabel = exhibition.gallery?.label ?? 'unknown-gallery';
+  const exhibitionLabel = exhibition.label ?? 'unknown-exhibition';
+
   return {
     id: artwork.id,
     src: `/public/artwork/${artwork.id}/unity-image`,
-    width: artwork.width,
-    height: artwork.height,
-    name: artwork.name,
+    width: artwork.width ?? 0,
+    height: artwork.height ?? 0,
+    name: artwork.name ?? 'Untitled',
     description: artwork.description,
-    artist: artwork.artist.name,
-    worktype: artwork.artworkWorktype?.name,
-    material: artwork.artworkMaterial?.name,
-    technique: artwork.artworkTechnique?.name,
-    genre: artwork.artworkGenre?.name,
-    measurements: artwork.measurements,
-    exhibition: exhibition.name,
-    gallery: exhibition.gallery.name,
-    year: artwork.year,
-    urlArtwork: `/public/artwork?slug=${artwork.artist.user.label}/${artwork.artist.label}/${artwork.label}`,
-    urlExhibition: `/public/exhibition?slug=${exhibition.gallery.user.label}/${exhibition.gallery.label}/${exhibition.label}`,
-    urlGallery: `/public/gallery?slug=${exhibition.gallery.user.label}/${exhibition.gallery.label}`,
+    artist: artistName,
+    worktype: artwork.artworkWorktype?.name ?? 'Unknown Worktype',
+    material: artwork.artworkMaterial?.name ?? 'Unknown Material',
+    technique: artwork.artworkTechnique?.name ?? 'Unknown Technique',
+    genre: artwork.artworkGenre?.name ?? 'Unknown Genre',
+    measurements: artwork.measurements ?? '',
+    exhibition: exhibition.name ?? 'Unknown Exhibition',
+    gallery: exhibition.gallery?.name ?? 'Unknown Gallery',
+    year: artwork.year ?? '',
+    urlArtwork: `/public/artwork?slug=${userLabel}/${artistLabel}/${artworkLabel}`,
+    urlExhibition: `/public/exhibition?slug=${galleryUserLabel}/${galleryLabel}/${exhibitionLabel}`,
+    urlGallery: `/public/gallery?slug=${galleryUserLabel}/${galleryLabel}`,
   };
 }
 
