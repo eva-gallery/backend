@@ -6,7 +6,7 @@ import { deserializeEntity } from '@common/helpers';
 import { getExtensionForMimeType } from '@common/helpers';
 import {
   Artist, Artwork, Gallery, Exhibition, Nft, Resource, UnityRoom, UnityItemType,
-  ArtworkId, ResourceId, UnityRoomId,
+  ArtworkId, ResourceId, UnityRoomId, ExhibitionId, 
   ArtworkImageId
 } from '../entities';
 
