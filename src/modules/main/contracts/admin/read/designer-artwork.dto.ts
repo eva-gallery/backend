@@ -6,6 +6,7 @@ export interface DesignerArtworkDto {
   width: number;
   height: number;
   name: string;
+  description?: string;
   artist: string;
   worktype: string;
   material: string;
