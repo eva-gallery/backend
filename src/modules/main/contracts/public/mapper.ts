@@ -14,7 +14,7 @@ import {
   Artist, Artwork, Gallery, Exhibition, Nft
 } from '@modules/app-db/entities';
 
-export { createDesignerRoomDto, createDesignerLibraryItemDto } from '../admin/read';
+export { createDesignerRoomDto, createDesignerLibraryItemDto, createDesignerArtworkDto } from '../admin/read';
 
 export function createArtistDto(artist: Artist): ArtistDto {
   const artwork = artist.artworks.length > 0 ? artist.artworks[0] : null;
