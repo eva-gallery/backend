@@ -6,7 +6,7 @@ import { deserializeEntity } from '@common/helpers';
 import { getExtensionForMimeType } from '@common/helpers';
 import {
   Artist, Artwork, Gallery, Exhibition, Nft, Resource, UnityRoom, UnityItemType,
-  ArtworkId, ResourceId, UnityRoomId,
+  ArtworkId, ResourceId, UnityRoomId, ExhibitionId, 
   ArtworkImageId
 } from '../entities';
 
@@ -402,6 +402,51 @@ export class PublicRepository {
     return query.getMany();
   }
 
+  async getRoomExhibitionInfo(id: UnityRoomId) {
+  return this.unityRooms.findOne({
+    select: {
+      id: true,
+      exhibition: {
+        id: true,
+        name: true,
+        gallery: {
+          id: true,
+          name: true,
+        }
+      }
+    },
+    relations: {
+      exhibition: { gallery: true }
+    },
+    where: {
+      id: id,
+      exhibition: {
+        public: true,
+        gallery: { public: true },
+      }
+    }
+  });
+}
+
+async getExhibitionArtworks(exhibitionId: ExhibitionId) {
+  return this.artworks.find({
+    relations: {
+      artist: true,
+      artworkGenre: true,
+      artworkWorktype: true,
+      artworkMaterial: true,
+      artworkTechnique: true,
+    },
+    where: {
+      exhibitions: {
+        id: exhibitionId
+      },
+      public: true,
+      artist: { public: true },
+    }
+  });
+}
+  
   async getItemTypes() {
     return this.unityItemTypes.find();
   }
