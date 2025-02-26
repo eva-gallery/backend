@@ -447,8 +447,8 @@ async getExhibitionArtworks(exhibitionId: ExhibitionId) {
   });
 }
 
-  async getExhibitionDetailById(id: ExhibitionId) {
-  return this.exhibitions.findOne({
+async getExhibitionDetailById(id: ExhibitionId): Promise<Exhibition> {
+  return Promise.resolve(this.exhibitions.findOne({
     relations: {
       gallery: {
         user: true
@@ -461,11 +461,11 @@ async getExhibitionArtworks(exhibitionId: ExhibitionId) {
         public: true 
       }
     }
-  });
+  }));
 }
 
-async getExhibitionArtworksById(id: ExhibitionId) {
-  return this.artworks.find({
+async getExhibitionArtworksById(id: ExhibitionId): Promise<Artwork[]> {
+  return Promise.resolve(this.artworks.find({
     relations: {
       artist: {
         user: true,
@@ -485,7 +485,7 @@ async getExhibitionArtworksById(id: ExhibitionId) {
         public: true 
       }
     }
-  });
+  }));
 }
   
   async getItemTypes() {
