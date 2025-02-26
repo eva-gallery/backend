@@ -151,12 +151,23 @@ export class PublicController {
 
 @Get('designer/room/:id/artwork')
 async getDesignerRoomArtworks(@Param('id', ParseUUIDPipe) id: UnityRoomId) {
-  const info = await this.publicRepository.getRoomExhibitionInfo(id);
-  if (info == null)
+  // Get the room data (this stays the same)
+  const room = await this.publicRepository.getDesignerRoom(id);
+  if (room == null)
     throw new NotFoundException();
-  const artworks = await this.publicRepository.getExhibitionArtworks(info.exhibition.id);
-  // Map directly without using mapAsync
-  return artworks.map(artwork => mapper.createPublicDesignerArtworkDto(artwork, info.exhibition));
+    
+  // Use the new method to get exhibition details
+  const exhibition = await this.publicRepository.getExhibitionDetailById(room.exhibitionId);
+  if (exhibition == null)
+    throw new NotFoundException();
+    
+  // Use the new method to get artwork data
+  const artworks = await this.publicRepository.getExhibitionArtworksById(exhibition.id);
+  
+  // Map with explicit typing
+  return artworks.map((artwork: Artwork) => 
+    mapper.createPublicDesignerArtworkDto(artwork, exhibition)
+  );
 }
 
   @Get('designer/library')
