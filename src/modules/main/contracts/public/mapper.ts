@@ -193,3 +193,28 @@ export function createNftDetailDto(nft: Nft): NftDetailDto {
     }
   };
 }
+
+export function createPublicDesignerArtworkDto(artwork: Artwork, exhibition: Exhibition): DesignerArtworkDto {
+  return {
+    id: artwork.id,
+    src: `/public/artwork/${artwork.id}/unity-image`,
+    width: artwork.width,
+    height: artwork.height,
+    name: artwork.name,
+    description: artwork.description,
+    artist: artwork.artist.name,
+    worktype: artwork.artworkWorktype?.name,
+    material: artwork.artworkMaterial?.name,
+    technique: artwork.artworkTechnique?.name,
+    genre: artwork.artworkGenre?.name,
+    measurements: artwork.measurements,
+    exhibition: exhibition.name,
+    gallery: exhibition.gallery.name,
+    year: artwork.year,
+    urlArtwork: `/public/artwork?slug=${artwork.artist.user.label}/${artwork.artist.label}/${artwork.label}`,
+    urlExhibition: `/public/exhibition?slug=${exhibition.gallery.user.label}/${exhibition.gallery.label}/${exhibition.label}`,
+    urlGallery: `/public/gallery?slug=${exhibition.gallery.user.label}/${exhibition.gallery.label}`,
+  };
+}
+
+
