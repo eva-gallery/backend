@@ -446,6 +446,47 @@ async getExhibitionArtworks(exhibitionId: ExhibitionId) {
     }
   });
 }
+
+  async getExhibitionDetailById(id: ExhibitionId) {
+  return this.exhibitions.findOne({
+    relations: {
+      gallery: {
+        user: true
+      }
+    },
+    where: {
+      id: id,
+      public: true,
+      gallery: { 
+        public: true 
+      }
+    }
+  });
+}
+
+async getExhibitionArtworksById(id: ExhibitionId) {
+  return this.artworks.find({
+    relations: {
+      artist: {
+        user: true,
+        country: true
+      },
+      artworkGenre: true,
+      artworkWorktype: true,
+      artworkMaterial: true,
+      artworkTechnique: true
+    },
+    where: {
+      exhibitions: {
+        id: id
+      },
+      public: true,
+      artist: { 
+        public: true 
+      }
+    }
+  });
+}
   
   async getItemTypes() {
     return this.unityItemTypes.find();
