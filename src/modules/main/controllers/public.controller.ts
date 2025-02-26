@@ -151,12 +151,18 @@ export class PublicController {
 
 @Get('designer/room/:id/artwork')
 async getDesignerRoomArtworks(@Param('id', ParseUUIDPipe) id: UnityRoomId) {
-  const info = await this.publicRepository.getRoomExhibitionInfo(id);
-  if (info == null)
+  // This mimics the admin version but uses the public mapper and doesn't require authentication
+  const room = await this.publicRepository.getDesignerRoom(id);
+  if (room == null)
     throw new NotFoundException();
-  const artworks = await this.publicRepository.getExhibitionArtworks(info.exhibition.id);
-  // Map directly without using mapAsync
-  return artworks.map(artwork => mapper.createPublicDesignerArtworkDto(artwork, info.exhibition));
+  // Get exhibition info from the room
+  const exhibition = await this.publicRepository.getExhibitionDetailById(room.exhibitionId);
+  if (exhibition == null)
+    throw new NotFoundException();
+  // Get artworks for this exhibition
+  const artworks = await this.publicRepository.getExhibitionArtworksById(exhibition.id);
+  // Map artworks using the public mapper
+  return mapAsync(artworks, (artwork) => mapper.createPublicDesignerArtworkDto(artwork, exhibition));
 }
 
   @Get('designer/library')
