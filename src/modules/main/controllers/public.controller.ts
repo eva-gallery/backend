@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Query, ParseIntPipe, ParseUUIDPipe, Param, Response, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Response as ExpressResponse } from 'express';
 import { PublicRepository, MAX_SEED } from '@modules/app-db/repositories';
-import { ArtworkId, ResourceId, UnityRoomId } from '@modules/app-db/entities';
+import { ArtworkId, GalleryType, ResourceId, UnityRoomId } from '@modules/app-db/entities';
 import { HttpApiService } from '@modules/http-api';
 import { mapAsync } from '@common/helpers';
 import { AddArtworkLikeDto } from '../contracts/public';
@@ -27,8 +27,8 @@ export class PublicController {
   }
 
   @Get('random/gallery')
-  async getRandomGalleries(@Query('seed', new ParseIntPipe({ optional: true })) seed = this.createSeed(), @Query('from', new ParseIntPipe({ optional: true })) from = 0, @Query('count', ParseIntPipe) count: number) {
-    return mapAsync(this.publicRepository.getRandomGalleries(seed, from, count), mapper.createGalleryDto);
+  async getRandomGalleries(@Query('seed', new ParseIntPipe({ optional: true })) seed = this.createSeed(), @Query('from', new ParseIntPipe({ optional: true })) from = 0, @Query('count', ParseIntPipe) count: number, @Query('type') type: GalleryType) {
+    return mapAsync(this.publicRepository.getRandomGalleries(seed, from, count, type), mapper.createGalleryDto);
   }
 
   @Get('random/exhibition')

@@ -7,7 +7,8 @@ import { getExtensionForMimeType } from '@common/helpers';
 import {
   Artist, Artwork, Gallery, Exhibition, Nft, Resource, UnityRoom, UnityItemType,
   ArtworkId, ResourceId, UnityRoomId,
-  ArtworkImageId
+  ArtworkImageId,
+  GalleryType
 } from '../entities';
 
 export const MAX_SEED = 2 ** 32;
@@ -121,7 +122,7 @@ export class PublicRepository {
     });
   }
 
-  async getRandomGalleries(seed: number, from: number = 0, count: number = 1) {
+  async getRandomGalleries(seed: number, from: number = 0, count: number = 1, type: GalleryType = GalleryType.Real) {
     const nseed = seed / MAX_SEED;
     return this.artworks.manager.transaction(async mgr => {
       await mgr.query(`SELECT setseed(${nseed})`);
@@ -130,6 +131,7 @@ export class PublicRepository {
         .innerJoinAndSelect("gallery.country", "country")
         .orderBy("random()")
         .where("gallery.public = true")
+        .andWhere("gallery.type = :type", { type })
         .offset(from)
         .limit(count)
         .getMany();
