@@ -13,6 +13,7 @@ import { getExtensionForMimeType } from '@common/helpers';
 import {
   Artist, Artwork, Gallery, Exhibition, Nft
 } from '@modules/app-db/entities';
+import { DesignerArtworkDto } from '../admin/read/designer-artwork.dto';
 
 export { createDesignerRoomDto, createDesignerLibraryItemDto, createDesignerArtworkDto } from '../admin/read';
 
