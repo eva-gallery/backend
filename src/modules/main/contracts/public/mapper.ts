@@ -213,16 +213,16 @@ export function createPublicDesignerArtworkDto(artwork: Artwork, exhibition: Exh
   // Create base DTO with required properties
   const dto: any = {
     id: artwork.id,
-    src: `/admin/artwork/${artwork.id}/unity-image`, // This remains as admin path for image loading
+    src: `/public/artwork/${artwork.id}/unity-image`, // This remains as admin path for image loading
     width: artwork.width,
     height: artwork.height,
     name: artwork.name,
     artist: artwork.artist.name,
     exhibition: exhibition.name,
     gallery: exhibition.gallery.name,
-    urlArtwork: `/artwork/${artworkSlug}`,
-    urlExhibition: `/exhibition/${exhibitionSlug}`,
-    urlGallery: `/gallery/${gallerySlug}`,
+    urlArtwork: `/artworks/${artworkSlug}`,
+    urlExhibition: `/exhibitions/${exhibitionSlug}`,
+    urlGallery: `/galleries/${gallerySlug}`,
   };
   
   // Add optional properties only if they exist
