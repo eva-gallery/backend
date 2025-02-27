@@ -196,36 +196,44 @@ export function createNftDetailDto(nft: Nft): NftDetailDto {
 }
 
 export function createPublicDesignerArtworkDto(artwork: Artwork, exhibition: Exhibition): DesignerArtworkDto {
-  // Add null checks to prevent undefined errors
-  const artistName = artwork.artist?.name ?? 'Unknown Artist';
-  const userLabel = artwork.artist?.user?.label ?? 'unknown-user';
-  const artistLabel = artwork.artist?.label ?? 'unknown-artist';
-  const artworkLabel = artwork.label ?? 'unknown-artwork';
-
-  const galleryUserLabel = exhibition.gallery?.user?.label ?? 'unknown-user';
-  const galleryLabel = exhibition.gallery?.label ?? 'unknown-gallery';
-  const exhibitionLabel = exhibition.label ?? 'unknown-exhibition';
-
-  return {
+  
+  // For artwork: userLabel/artistLabel/artworkLabel
+  const userLabel = artwork.artist.user?.label || "unknown-user";
+  const artistLabel = artwork.artist?.label || "unknown-artist";
+  const artworkLabel = artwork?.label || "unknown-artwork";
+  const artworkSlug = `${userLabel}/${artistLabel}/${artworkLabel}`;
+  
+  // For exhibition: galleryUserLabel/galleryLabel/exhibitionLabel
+  const galleryUserLabel = exhibition.gallery.user?.label || "unknown-user";
+  const galleryLabel = exhibition.gallery?.label || "unknown-gallery";
+  const exhibitionLabel = exhibition?.label || "unknown-exhibition";
+  const exhibitionSlug = `${galleryUserLabel}/${galleryLabel}/${exhibitionLabel}`;
+  const gallerySlug = `${galleryUserLabel}/${galleryLabel}`;
+  
+  // Create base DTO with required properties
+  const dto: any = {
     id: artwork.id,
-    src: `/public/artwork/${artwork.id}/unity-image`,
-    width: artwork.width ?? 0,
-    height: artwork.height ?? 0,
-    name: artwork.name ?? 'Untitled',
-    description: artwork.description,
-    artist: artistName,
-    worktype: artwork.artworkWorktype?.name ?? 'Unknown Worktype',
-    material: artwork.artworkMaterial?.name ?? 'Unknown Material',
-    technique: artwork.artworkTechnique?.name ?? 'Unknown Technique',
-    genre: artwork.artworkGenre?.name ?? 'Unknown Genre',
-    measurements: artwork.measurements ?? '',
-    exhibition: exhibition.name ?? 'Unknown Exhibition',
-    gallery: exhibition.gallery?.name ?? 'Unknown Gallery',
-    year: artwork.year ?? '',
-    urlArtwork: `/public/artwork?slug=${userLabel}/${artistLabel}/${artworkLabel}`,
-    urlExhibition: `/public/exhibition?slug=${galleryUserLabel}/${galleryLabel}/${exhibitionLabel}`,
-    urlGallery: `/public/gallery?slug=${galleryUserLabel}/${galleryLabel}`,
+    src: `/admin/artwork/${artwork.id}/unity-image`, // This remains as admin path for image loading
+    width: artwork.width,
+    height: artwork.height,
+    name: artwork.name,
+    artist: artwork.artist.name,
+    exhibition: exhibition.name,
+    gallery: exhibition.gallery.name,
+    urlArtwork: `/artwork/${artworkSlug}`,
+    urlExhibition: `/exhibition/${exhibitionSlug}`,
+    urlGallery: `/gallery/${gallerySlug}`,
   };
+  
+  // Add optional properties only if they exist
+  if (artwork.artworkWorktype?.name) dto.worktype = artwork.artworkWorktype.name;
+  if (artwork.artworkMaterial?.name) dto.material = artwork.artworkMaterial.name;
+  if (artwork.artworkTechnique?.name) dto.technique = artwork.artworkTechnique.name;
+  if (artwork.artworkGenre?.name) dto.genre = artwork.artworkGenre.name;
+  if (artwork.measurements) dto.measurements = artwork.measurements;
+  if (artwork.year) dto.year = artwork.year;
+  
+  return dto as DesignerArtworkDto;
 }
 
 
