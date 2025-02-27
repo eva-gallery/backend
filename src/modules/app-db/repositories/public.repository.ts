@@ -245,24 +245,34 @@ export class PublicRepository {
   }
 
   async getExhibitionDetailBySlug(userLabel: string, galleryLabel: string, exhibitionLabel: string) {
-    return this.exhibitions.findOne({
-      relations: {
-        gallery: {
-          country: true,
-          user: true
-        }
-      },
-      where: {
-        label: exhibitionLabel,
-        public: true,
-        gallery: {
-          label: galleryLabel,
-          public: true,
-          user: { label: userLabel }
-        }
+  return this.exhibitions.findOne({
+    // Add select to explicitly include activeRoomId
+    select: {
+      id: true,
+      name: true,
+      fromDate: true,
+      toDate: true,
+      curator: true,
+      activeRoomId: true,
+      public: true
+    },
+    relations: {
+      gallery: {
+        country: true,
+        user: true
       }
-    });
-  }
+    },
+    where: {
+      label: exhibitionLabel,
+      public: true,
+      gallery: {
+        label: galleryLabel,
+        public: true,
+        user: { label: userLabel }
+      }
+    }
+  });
+}
 
   async getNftDetailBySlug(userLabel: string, nftLabel: string) {
     return this.nfts.findOne({
