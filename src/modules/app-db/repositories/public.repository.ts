@@ -260,7 +260,8 @@ export class PublicRepository {
       gallery: {
         country: true,
         user: true
-      }
+      },
+      activeRoom: true 
     },
     where: {
       label: exhibitionLabel,
