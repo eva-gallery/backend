@@ -130,6 +130,7 @@ export function createGalleryDetailDto(gallery: Gallery): GalleryDetailDto {
 export function createExhibitionDto(exhibition: Exhibition): ExhibitionDto {
   const artwork = exhibition.artworks?.[0] ?? null;
   return {
+    id: exhibition.id, 
     name: exhibition.name,
     fromDate: exhibition.fromDate?.toISOString() ?? null,
     toDate: exhibition.toDate?.toISOString() ?? null,
@@ -149,6 +150,7 @@ export function createExhibitionDto(exhibition: Exhibition): ExhibitionDto {
 
 export function createExhibitionDetailDto(exhibition: Exhibition): ExhibitionDetailDto {
   return {
+    id: exhibition.id, 
     name: exhibition.name,
     fromDate: exhibition.fromDate?.toISOString() ?? null,
     toDate: exhibition.toDate?.toISOString() ?? null,
