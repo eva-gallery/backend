@@ -1,4 +1,5 @@
 import { UnityRoomId } from '@modules/app-db/entities';
+import { ExhibitionId } from '@modules/app-db/entities';
 
 export interface ExhibitionDto {
   id: ExhibitionId;  
