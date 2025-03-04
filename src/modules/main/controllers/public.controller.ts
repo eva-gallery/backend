@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Query, ParseIntPipe, ParseUUIDPipe, Param, Response, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Response as ExpressResponse } from 'express';
 import { PublicRepository, MAX_SEED } from '@modules/app-db/repositories';
-import { ArtworkId, ResourceId, UnityRoomId, Artwork } from '@modules/app-db/entities';
+import { ArtworkId, ResourceId, UnityRoomId, ExhibitionId, Artwork } from '@modules/app-db/entities';
 import { HttpApiService } from '@modules/http-api';
 import { mapAsync } from '@common/helpers';
 import { AddArtworkLikeDto } from '../contracts/public';
