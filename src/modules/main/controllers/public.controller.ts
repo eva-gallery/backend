@@ -80,12 +80,12 @@ export class PublicController {
   @Get('exhibition/:id/artwork')
 async getExhibitionArtworks(@Param('id', ParseUUIDPipe) id: ExhibitionId) {
   // First check if the exhibition exists and is public
-  const exhibition = await this.publicRepository.getExhibitionDetailById(id);
+  const exhibition = await this.publicRepository.findExhibitionById(id);
   if (exhibition == null)
     throw new NotFoundException();
     
   // Get artworks that are in this exhibition and are public
-  const artworks = await this.publicRepository.getExhibitionArtworksById(id);
+  const artworks = await this.publicRepository.findExhibitionArtworks(id);
   
   // Map to DTOs for public display
   return artworks.map(artwork => mapper.createArtworkDto(artwork));
