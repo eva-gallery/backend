@@ -77,6 +77,20 @@ export class PublicController {
     return mapper.createExhibitionDetailDto(exhibition);
   }
 
+  @Get('exhibition/:id/artwork')
+async getExhibitionArtworks(@Param('id', ParseUUIDPipe) id: ExhibitionId) {
+  // First check if the exhibition exists and is public
+  const exhibition = await this.publicRepository.getExhibitionDetailById(id);
+  if (exhibition == null)
+    throw new NotFoundException();
+    
+  // Get artworks that are in this exhibition and are public
+  const artworks = await this.publicRepository.getExhibitionArtworksById(id);
+  
+  // Map to DTOs for public display
+  return artworks.map(artwork => mapper.createArtworkDto(artwork));
+}
+
   @Get('nft')
   async getNftDetail(@Query('slug') slug: string) {
     const labels = this.parseSlug(slug, 2);
