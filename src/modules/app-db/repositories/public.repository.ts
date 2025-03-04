@@ -275,7 +275,7 @@ export class PublicRepository {
   });
 }
 
-  async getExhibitionDetailById(id: ExhibitionId) {
+  async findExhibitionById(id: ExhibitionId) {
   return this.exhibitions.findOne({
     relations: {
       gallery: {
@@ -290,7 +290,7 @@ export class PublicRepository {
   });
 }
 
-async getExhibitionArtworksById(id: ExhibitionId) {
+async findExhibitionArtworks(id: ExhibitionId) {
   return this.artworks.find({
     relations: {
       artist: {
