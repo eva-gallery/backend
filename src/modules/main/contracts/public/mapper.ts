@@ -11,7 +11,7 @@ import { NftDetailDto } from './nft-detail.dto';
 import { mapEmpty } from '@common/helpers';
 import { getExtensionForMimeType } from '@common/helpers';
 import {
-  Artist, Artwork, Gallery, Exhibition, ExhibitionId, Nft
+  Artist, Artwork, Gallery, Exhibition, Nft
 } from '@modules/app-db/entities';
 import { DesignerArtworkDto } from '../admin/read/designer-artwork.dto';
 
