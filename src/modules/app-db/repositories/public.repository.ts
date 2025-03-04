@@ -275,6 +275,46 @@ export class PublicRepository {
   });
 }
 
+  async findExhibitionById(id: ExhibitionId) {
+  return this.exhibitions.findOne({
+    relations: {
+      gallery: {
+        country: true,
+        user: true
+      }
+    },
+    where: {
+      id: id,
+      public: true
+    }
+  });
+}
+
+async findExhibitionArtworks(id: ExhibitionId) {
+  return this.artworks.find({
+    relations: {
+      artist: {
+        country: true,
+        user: true
+      },
+      artworkGenre: true,
+      artworkWorktype: true,
+      artworkMaterial: true,
+      artworkTechnique: true,
+    },
+    where: {
+      exhibitions: {
+        id: id,
+        public: true
+      },
+      public: true,
+      artist: { 
+        public: true 
+      }
+    }
+  });
+}
+
   async getNftDetailBySlug(userLabel: string, nftLabel: string) {
     return this.nfts.findOne({
       relations: {

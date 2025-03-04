@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Query, ParseIntPipe, ParseUUIDPipe, Param, Response, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Response as ExpressResponse } from 'express';
 import { PublicRepository, MAX_SEED } from '@modules/app-db/repositories';
-import { ArtworkId, ResourceId, UnityRoomId, Artwork } from '@modules/app-db/entities';
+import { ArtworkId, ResourceId, UnityRoomId, ExhibitionId, Artwork } from '@modules/app-db/entities';
 import { HttpApiService } from '@modules/http-api';
 import { mapAsync } from '@common/helpers';
 import { AddArtworkLikeDto } from '../contracts/public';
@@ -76,6 +76,20 @@ export class PublicController {
       throw new NotFoundException();
     return mapper.createExhibitionDetailDto(exhibition);
   }
+
+  @Get('exhibition/:id/artwork')
+async getExhibitionArtworks(@Param('id', ParseUUIDPipe) id: ExhibitionId) {
+  // First check if the exhibition exists and is public
+  const exhibition = await this.publicRepository.findExhibitionById(id);
+  if (exhibition == null)
+    throw new NotFoundException();
+    
+  // Get artworks that are in this exhibition and are public
+  const artworks = await this.publicRepository.findExhibitionArtworks(id);
+  
+  // Map to DTOs for public display
+  return artworks.map(artwork => mapper.createArtworkDto(artwork));
+}
 
   @Get('nft')
   async getNftDetail(@Query('slug') slug: string) {
