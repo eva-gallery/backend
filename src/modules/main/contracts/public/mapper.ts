@@ -11,7 +11,7 @@ import { NftDetailDto } from './nft-detail.dto';
 import { mapEmpty } from '@common/helpers';
 import { getExtensionForMimeType } from '@common/helpers';
 import {
-  Artist, Artwork, Gallery, Exhibition, Nft
+  Artist, Artwork, Gallery, Exhibition, ExhibitionId, Nft
 } from '@modules/app-db/entities';
 import { DesignerArtworkDto } from '../admin/read/designer-artwork.dto';
 
@@ -130,6 +130,7 @@ export function createGalleryDetailDto(gallery: Gallery): GalleryDetailDto {
 export function createExhibitionDto(exhibition: Exhibition): ExhibitionDto {
   const artwork = exhibition.artworks?.[0] ?? null;
   return {
+    id: exhibition.id, 
     name: exhibition.name,
     fromDate: exhibition.fromDate?.toISOString() ?? null,
     toDate: exhibition.toDate?.toISOString() ?? null,
@@ -149,6 +150,7 @@ export function createExhibitionDto(exhibition: Exhibition): ExhibitionDto {
 
 export function createExhibitionDetailDto(exhibition: Exhibition): ExhibitionDetailDto {
   return {
+    id: exhibition.id, 
     name: exhibition.name,
     fromDate: exhibition.fromDate?.toISOString() ?? null,
     toDate: exhibition.toDate?.toISOString() ?? null,
