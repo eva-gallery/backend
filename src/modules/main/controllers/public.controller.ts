@@ -147,7 +147,7 @@ async getExhibitionArtworks(@Param('id', ParseUUIDPipe) id: ExhibitionId) {
     res.set({ "Content-Type": item.mimeType }).send(item.image);
   }
 
-  @Get('gallery/:id/exhibition')
+@Get('gallery/:id/exhibition')
 async getGalleryExhibitions(@Param('id') slug: string) {
   const labels = this.parseSlug(slug, 2);
   const gallery = await this.publicRepository.getGalleryDetailBySlug(labels[0], labels[1]);
@@ -155,7 +155,7 @@ async getGalleryExhibitions(@Param('id') slug: string) {
     throw new NotFoundException();
   
   const exhibitions = await this.publicRepository.getGalleryPublicExhibitions(labels[0], labels[1]);
-  return mapAsync(exhibitions, mapper.createExhibitionDto);
+  return exhibitions.map(exhibition => mapper.createExhibitionDto(exhibition));
 }
 
   @Get('resource/:id/content')
