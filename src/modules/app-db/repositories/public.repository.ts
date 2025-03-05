@@ -231,6 +231,23 @@ export class PublicRepository {
     });
   }
 
+async getGalleryPublicExhibitions(userLabel: string, galleryLabel: string) {
+  return this.exhibitions.find({
+    relations: {
+      gallery: true,
+      artworks: { artist: true },
+    },
+    where: {
+      public: true,
+      gallery: {
+        label: galleryLabel,
+        public: true,
+        user: { label: userLabel }
+      }
+    }
+  });
+}
+  
   async getGalleryDetailBySlug(userLabel: string, galleryLabel: string) {
     return this.galleries.findOne({
       relations: {
