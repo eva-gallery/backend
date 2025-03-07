@@ -256,8 +256,6 @@ async getGalleryPublicExhibitions(userLabel: string, galleryLabel: string) {
   });
 }
 
- // In src/modules/app-db/repositories/public.repository.ts
-
 async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
   // First, let's find the artist to confirm it exists
   const artist = await this.artists.findOne({
@@ -268,7 +266,7 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
     }
   });
   
-  if (!artist) {
+  if (artist === null || artist === undefined) {
     return [];
   }
   
@@ -280,7 +278,7 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
     }
   });
   
-  if (!artworks || artworks.length === 0) {
+  if (artworks === null || artworks === undefined || artworks.length === 0) {
     return [];
   }
   
