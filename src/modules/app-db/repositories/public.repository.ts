@@ -255,6 +255,34 @@ async getGalleryPublicExhibitions(userLabel: string, galleryLabel: string) {
     }
   });
 }
+
+  async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
+  return this.exhibitions.find({
+    relations: {
+      gallery: { 
+        user: true,
+        country: true 
+      },
+      artworks: { 
+        artist: {
+          user: true,
+          country: true
+        } 
+      }
+    },
+    where: {
+      public: true,
+      artworks: {
+        artist: {
+          label: artistLabel,
+          public: true,
+          user: { label: userLabel }
+        }
+      }
+    },
+    distinct: true
+  });
+}
   
   async getGalleryDetailBySlug(userLabel: string, galleryLabel: string) {
     return this.galleries.findOne({
