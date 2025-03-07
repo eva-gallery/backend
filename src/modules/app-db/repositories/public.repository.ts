@@ -255,6 +255,22 @@ async getGalleryPublicExhibitions(userLabel: string, galleryLabel: string) {
     }
   });
 }
+
+  async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
+  return this.exhibitions.createQueryBuilder("exhibition")
+    .innerJoinAndSelect("exhibition.gallery", "gallery")
+    .innerJoin("gallery.user", "gallery_user")
+    .innerJoinAndSelect("exhibition.artworks", "artwork")
+    .innerJoin("artwork.artist", "artist")
+    .innerJoin("artist.user", "artist_user")
+    .innerJoinAndSelect("gallery.country", "gallery_country")
+    .innerJoinAndSelect("artist.country", "artist_country")
+    .where("exhibition.public = :public", { public: true })
+    .andWhere("artist.label = :artistLabel", { artistLabel })
+    .andWhere("artist.public = :artistPublic", { artistPublic: true })
+    .andWhere("artist_user.label = :userLabel", { userLabel })
+    .getMany();
+}
   
   async getGalleryDetailBySlug(userLabel: string, galleryLabel: string) {
     return this.galleries.findOne({

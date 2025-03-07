@@ -181,6 +181,40 @@ async getGalleryExhibitions(@Query('slug') slug: string) {
     .map(exhibition => mapper.createExhibitionDto(exhibition));
 }
 
+@Get('artist/exhibition')
+async getArtistExhibitions(@Query('slug') slug: string) {
+  if (slug === undefined || slug === null || slug === '') {
+    throw new BadRequestException('Missing slug parameter');
+  }
+  
+  const labels = this.parseSlug(slug, 2);
+  const artist = await this.publicRepository.getArtistDetailBySlug(labels[0], labels[1]);
+  if (artist === null) {
+    throw new NotFoundException();
+  }
+  
+  const exhibitions = await this.publicRepository.getArtistPublicExhibitions(labels[0], labels[1]);
+  
+  // Make sure exhibitions array exists before mapping
+  if (exhibitions === undefined || exhibitions === null || exhibitions.length === 0) {
+    return [];
+  }
+  
+  // Check that all required properties exist before mapping
+  return exhibitions
+    .filter(exhibition => 
+      exhibition !== null && 
+      exhibition !== undefined &&
+      exhibition.gallery !== null && 
+      exhibition.gallery !== undefined &&
+      exhibition.gallery.user !== null && 
+      exhibition.gallery.user !== undefined &&
+      Array.isArray(exhibition.artworks) && 
+      exhibition.artworks.length > 0
+    )
+    .map(exhibition => mapper.createExhibitionDto(exhibition));
+}
+  
   @Get('resource/:id/content')
   async getResourceContent(@Param('id', ParseUUIDPipe) id: ResourceId, @Response() res: ExpressResponse) {
     const item = await this.publicRepository.getResourceContent(id);
