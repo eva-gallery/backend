@@ -256,19 +256,46 @@ async getGalleryPublicExhibitions(userLabel: string, galleryLabel: string) {
   });
 }
 
-  async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
+ // In src/modules/app-db/repositories/public.repository.ts
+
+async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
+  // First, let's find the artist to confirm it exists
+  const artist = await this.artists.findOne({
+    where: {
+      label: artistLabel,
+      public: true,
+      user: { label: userLabel }
+    }
+  });
+  
+  if (!artist) {
+    return [];
+  }
+  
+  // Now, let's find all artworks by this artist
+  const artworks = await this.artworks.find({
+    where: {
+      artist: { id: artist.id },
+      public: true
+    }
+  });
+  
+  if (!artworks || artworks.length === 0) {
+    return [];
+  }
+  
+  // Find all exhibitions that contain these artworks
   return this.exhibitions.createQueryBuilder("exhibition")
     .innerJoinAndSelect("exhibition.gallery", "gallery")
-    .innerJoin("gallery.user", "gallery_user")
-    .innerJoinAndSelect("exhibition.artworks", "artwork")
-    .innerJoin("artwork.artist", "artist")
-    .innerJoin("artist.user", "artist_user")
-    .innerJoinAndSelect("gallery.country", "gallery_country")
+    .innerJoinAndSelect("gallery.user", "gallery_user")
+    .innerJoinAndSelect("gallery.country", "country")
+    .innerJoin("exhibition.artworks", "artwork")
+    .innerJoinAndSelect("exhibition.artworks", "exhibition_artworks")
+    .innerJoinAndSelect("exhibition_artworks.artist", "artist")
+    .innerJoinAndSelect("artist.user", "artist_user")
     .innerJoinAndSelect("artist.country", "artist_country")
     .where("exhibition.public = :public", { public: true })
-    .andWhere("artist.label = :artistLabel", { artistLabel })
-    .andWhere("artist.public = :artistPublic", { artistPublic: true })
-    .andWhere("artist_user.label = :userLabel", { userLabel })
+    .andWhere("artwork.id IN (:...artworkIds)", { artworkIds: artworks.map(a => a.id) })
     .getMany();
 }
   
