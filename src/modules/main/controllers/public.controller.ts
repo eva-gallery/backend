@@ -149,13 +149,33 @@ async getExhibitionArtworks(@Param('id', ParseUUIDPipe) id: ExhibitionId) {
 
 @Get('gallery/exhibition')
 async getGalleryExhibitions(@Query('slug') slug: string) {
+  if (!slug) {
+    throw new BadRequestException('Missing slug parameter');
+  }
+  
   const labels = this.parseSlug(slug, 2);
   const gallery = await this.publicRepository.getGalleryDetailBySlug(labels[0], labels[1]);
-  if (gallery == null)
+  if (gallery == null) {
     throw new NotFoundException();
+  }
   
   const exhibitions = await this.publicRepository.getGalleryPublicExhibitions(labels[0], labels[1]);
-  return exhibitions.map(exhibition => mapper.createExhibitionDto(exhibition));
+  
+  // Make sure exhibitions array exists before mapping
+  if (!exhibitions || exhibitions.length === 0) {
+    return [];
+  }
+  
+  // Check that all required properties exist before mapping
+  return exhibitions
+    .filter(exhibition => 
+      exhibition && 
+      exhibition.gallery && 
+      exhibition.gallery.user &&
+      exhibition.artworks && 
+      exhibition.artworks.length > 0
+    )
+    .map(exhibition => mapper.createExhibitionDto(exhibition));
 }
 
   @Get('resource/:id/content')
