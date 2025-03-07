@@ -234,7 +234,7 @@ export class PublicRepository {
 async getGalleryPublicExhibitions(userLabel: string, galleryLabel: string) {
   return this.exhibitions.find({
     relations: {
-      gallery: true,
+      gallery: { user: true },
       artworks: { artist: true },
     },
     where: {

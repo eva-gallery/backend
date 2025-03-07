@@ -147,8 +147,8 @@ async getExhibitionArtworks(@Param('id', ParseUUIDPipe) id: ExhibitionId) {
     res.set({ "Content-Type": item.mimeType }).send(item.image);
   }
 
-@Get('gallery/:id/exhibition')
-async getGalleryExhibitions(@Param('id') slug: string) {
+@Get('gallery/exhibition')
+async getGalleryExhibitions(@Query('slug') slug: string) {
   const labels = this.parseSlug(slug, 2);
   const gallery = await this.publicRepository.getGalleryDetailBySlug(labels[0], labels[1]);
   if (gallery == null)
