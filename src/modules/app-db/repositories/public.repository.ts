@@ -298,24 +298,7 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
   
   return exhibitions;
 }
-  
-  // Ensure each exhibition's artworks have imageHash and thumbnailFilename
-  for (const exhibition of exhibitions) {
-    if (exhibition.artworks && exhibition.artworks.length > 0) {
-      for (const artwork of exhibition.artworks) {
-        // Make sure imageHash is available
-        if (!artwork.imageHash) {
-          const fullArtwork = artworks.find(a => a.id === artwork.id);
-          if (fullArtwork && fullArtwork.imageHash) {
-            artwork.imageHash = fullArtwork.imageHash;
-          }
-        }
-      }
-    }
-  }
-  
-  return exhibitions;
-}
+
   
   async getGalleryDetailBySlug(userLabel: string, galleryLabel: string) {
     return this.galleries.findOne({
