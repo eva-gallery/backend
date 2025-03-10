@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeepPartial } from 'typeorm';
+import { Repository, DeepPartial, In } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { deserializeEntity } from '@common/helpers';
 import { getExtensionForMimeType } from '@common/helpers';
@@ -283,29 +283,26 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
   }
   
   // Find all exhibitions that contain these artworks
-  return this.exhibitions.createQueryBuilder("exhibition")
-    .innerJoinAndSelect("exhibition.gallery", "gallery")
-    .innerJoinAndSelect("gallery.user", "gallery_user")
-    .innerJoinAndSelect("gallery.country", "country")
-    .innerJoin("exhibition.artworks", "artwork")
-    .innerJoinAndSelect("exhibition.artworks", "exhibition_artworks", "exhibition_artworks.id IN (:...artworkIds)", { artworkIds: artworks.map(a => a.id) })
-    .innerJoinAndSelect("exhibition_artworks.artist", "artist")
-    .innerJoinAndSelect("artist.user", "artist_user")
-    .innerJoinAndSelect("artist.country", "artist_country")
-    .where("exhibition.public = :public", { public: true })
-    .andWhere("artwork.id IN (:...artworkIds)", { artworkIds: artworks.map(a => a.id) })
-    .select([
-      "exhibition",
-      "gallery",
-      "gallery_user",
-      "country",
-      "exhibition_artworks",
-      "exhibition_artworks.imageHash", // Explicitly select imageHash
-      "artist",
-      "artist_user",
-      "artist_country"
-    ])
-    .getMany();
+  return this.exhibitions.find({
+    relations: {
+      gallery: { 
+        user: true,
+        country: true 
+      },
+      artworks: { 
+        artist: {
+          user: true,
+          country: true
+        } 
+      }
+    },
+    where: {
+      public: true,
+      artworks: {
+        id: In(artworks.map(a => a.id))
+      }
+    }
+  });
 }
   
   async getGalleryDetailBySlug(userLabel: string, galleryLabel: string) {
