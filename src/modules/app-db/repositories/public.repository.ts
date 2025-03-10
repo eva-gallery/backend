@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeepPartial, In } from 'typeorm';
+import { Repository, DeepPartial } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { deserializeEntity } from '@common/helpers';
 import { getExtensionForMimeType } from '@common/helpers';
@@ -270,7 +270,7 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
     return [];
   }
   
-  // Now, let's find all artworks by this artist
+  // Get all artist's artworks
   const artworks = await this.artworks.find({
     where: {
       artist: { id: artist.id },
@@ -282,28 +282,23 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
     return [];
   }
   
-  // Find all exhibitions that contain these artworks
-  return this.exhibitions.find({
-    relations: {
-      gallery: { 
-        user: true,
-        country: true 
-      },
-      artworks: { 
-        artist: {
-          user: true,
-          country: true
-        } 
-      }
-    },
-    where: {
-      public: true,
-      artworks: {
-        id: In(artworks.map(a => a.id))
-      }
-    }
-  });
+  // Find exhibitions using these artworks
+  const exhibitions = await this.exhibitions.createQueryBuilder("exhibition")
+    .innerJoinAndSelect("exhibition.gallery", "gallery")
+    .innerJoinAndSelect("gallery.user", "gallery_user") 
+    .innerJoinAndSelect("gallery.country", "gallery_country")
+    .innerJoin("exhibition.artworks", "artwork", "artwork.id IN (:...artworkIds)", 
+      { artworkIds: artworks.map(a => a.id) })
+    .innerJoinAndSelect("exhibition.artworks", "exhibition_artworks")
+    .innerJoinAndSelect("exhibition_artworks.artist", "artist")
+    .innerJoinAndSelect("artist.user", "artist_user")
+    .innerJoinAndSelect("artist.country", "artist_country")
+    .where("exhibition.public = :public", { public: true })
+    .getMany();
+  
+  return exhibitions;
 }
+
   
   async getGalleryDetailBySlug(userLabel: string, galleryLabel: string) {
     return this.galleries.findOne({

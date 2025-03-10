@@ -199,7 +199,7 @@ async getArtistExhibitions(@Query('slug') slug: string) {
     return [];
   }
   
-  // Filter exhibitions with valid relationships
+  // Simply use the mapper without any modification
   return exhibitions
     .filter(exhibition => 
       exhibition !== null && 
