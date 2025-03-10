@@ -210,7 +210,7 @@ async getArtistExhibitions(@Query('slug') slug: string) {
     return [];
   }
   
-  // Transform to the extended DTO type
+  // Simply use the mapper without any modification
   return exhibitions
     .filter(exhibition => 
       exhibition !== null && 
@@ -222,13 +222,7 @@ async getArtistExhibitions(@Query('slug') slug: string) {
       Array.isArray(exhibition.artworks) && 
       exhibition.artworks.length > 0
     )
-    .map(exhibition => {
-      // Use the standard mapper
-      const dto = mapper.createExhibitionDto(exhibition);
-      
-      // Return as is - no need to modify
-      return dto;
-    });
+    .map(exhibition => mapper.createExhibitionDto(exhibition));
 }
   
   @Get('resource/:id/content')
