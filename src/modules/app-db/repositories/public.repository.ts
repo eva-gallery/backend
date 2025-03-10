@@ -288,12 +288,23 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
     .innerJoinAndSelect("gallery.user", "gallery_user")
     .innerJoinAndSelect("gallery.country", "country")
     .innerJoin("exhibition.artworks", "artwork")
-    .innerJoinAndSelect("exhibition.artworks", "exhibition_artworks")
+    .innerJoinAndSelect("exhibition.artworks", "exhibition_artworks", "exhibition_artworks.id IN (:...artworkIds)", { artworkIds: artworks.map(a => a.id) })
     .innerJoinAndSelect("exhibition_artworks.artist", "artist")
     .innerJoinAndSelect("artist.user", "artist_user")
     .innerJoinAndSelect("artist.country", "artist_country")
     .where("exhibition.public = :public", { public: true })
     .andWhere("artwork.id IN (:...artworkIds)", { artworkIds: artworks.map(a => a.id) })
+    .select([
+      "exhibition",
+      "gallery",
+      "gallery_user",
+      "country",
+      "exhibition_artworks",
+      "exhibition_artworks.imageHash", // Explicitly select imageHash
+      "artist",
+      "artist_user",
+      "artist_country"
+    ])
     .getMany();
 }
   
