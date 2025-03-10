@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeepPartial, In } from 'typeorm';
+import { Repository, DeepPartial } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { deserializeEntity } from '@common/helpers';
 import { getExtensionForMimeType } from '@common/helpers';
