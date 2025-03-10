@@ -257,7 +257,7 @@ async getGalleryPublicExhibitions(userLabel: string, galleryLabel: string) {
 }
 
 async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
-  // First, let's find the artist to confirm it exists
+  // First, find the artist
   const artist = await this.artists.findOne({
     where: {
       label: artistLabel,
@@ -270,8 +270,12 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
     return [];
   }
   
-  // Get all artist's artworks
+  // Get all artist's artworks including imageHash
   const artworks = await this.artworks.find({
+    select: {
+      id: true,
+      imageHash: true
+    },
     where: {
       artist: { id: artist.id },
       public: true
@@ -282,21 +286,59 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
     return [];
   }
   
-  // Find exhibitions using these artworks
-  const exhibitions = await this.exhibitions.createQueryBuilder("exhibition")
-    .innerJoinAndSelect("exhibition.gallery", "gallery")
-    .innerJoinAndSelect("gallery.user", "gallery_user") 
-    .innerJoinAndSelect("gallery.country", "gallery_country")
-    .innerJoin("exhibition.artworks", "artwork", "artwork.id IN (:...artworkIds)", 
-      { artworkIds: artworks.map(a => a.id) })
-    .innerJoinAndSelect("exhibition.artworks", "exhibition_artworks")
-    .innerJoinAndSelect("exhibition_artworks.artist", "artist")
-    .innerJoinAndSelect("artist.user", "artist_user")
-    .innerJoinAndSelect("artist.country", "artist_country")
-    .where("exhibition.public = :public", { public: true })
-    .getMany();
-  
-  return exhibitions;
+  // Similar to how getRandomExhibitions works in the repository
+  return this.exhibitions.manager.transaction(async mgr => {
+    const subQuery = mgr.getRepository(Artwork).createQueryBuilder("artwork")
+      .select(["artwork.id", "artwork.name", "artwork.label", "artwork.imageHash", "artwork.artist_id"])
+      .innerJoin("artwork.exhibitions", "ex", "ex.id = exhibition.id")
+      .innerJoin("artwork.artist", "artist", "artist.id = artwork.artist_id")
+      .addSelect(["artist.name", "artist.label"])
+      .where("artwork.public = true")
+      .andWhere("artwork.id IN (:...artworkIds)", { artworkIds: artworks.map(a => a.id) })
+      .orderBy("random()")
+      .limit(1);
+      
+    const query = await mgr.getRepository(Exhibition).createQueryBuilder("exhibition")
+      .innerJoinAndSelect("exhibition.gallery", "gallery")
+      .innerJoinAndSelect("gallery.user", "user")
+      .innerJoinAndSelect("gallery.country", "country")
+      .innerJoinAndSelect((qb) => {
+        qb.getQuery = () => `LATERAL (${subQuery.getQuery()})`;
+        return qb;
+      }, "artwork", "true")
+      .where("exhibition.public = true")
+      .andWhere(`exhibition.id IN (
+        SELECT e.id FROM exhibition e
+        JOIN exhibition_artworks_artwork eaa ON e.id = eaa.exhibition_id
+        WHERE eaa.artwork_id IN (:...artworkIds)
+      )`, { artworkIds: artworks.map(a => a.id) });
+      
+    const items = await query.getRawAndEntities();
+    const res = items.entities.map((exhibition, i) => {
+      const raw = items.raw[i];
+      const artist = deserializeEntity(mgr, Artist, raw);
+      artist.user = exhibition.gallery.user;
+      const artwork = deserializeEntity(mgr, Artwork, raw);
+      artwork.artist = artist;
+      
+      // Create a temporary object with computedProps for thumbnailFilename
+      const computedProps = {
+        get imageFilename() { 
+          return `${artwork.imageHash}.${getExtensionForMimeType(artwork.image?.mimeType || 'image/jpeg')}`;
+        },
+        get thumbnailFilename() {
+          return `${artwork.imageHash}.${getExtensionForMimeType(artwork.thumbnail?.mimeType || 'image/jpeg')}`;
+        }
+      };
+      
+      // Add computed properties
+      Object.defineProperties(artwork, Object.getOwnPropertyDescriptors(computedProps));
+      
+      exhibition.artworks = [artwork];
+      return exhibition;
+    });
+    return res;
+  });
 }
 
   
