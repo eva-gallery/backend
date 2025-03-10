@@ -195,12 +195,11 @@ async getArtistExhibitions(@Query('slug') slug: string) {
   
   const exhibitions = await this.publicRepository.getArtistPublicExhibitions(labels[0], labels[1]);
   
-  // Make sure exhibitions array exists before mapping
   if (exhibitions === undefined || exhibitions === null || exhibitions.length === 0) {
     return [];
   }
   
-  // Check that all required properties exist before mapping
+  // Filter exhibitions with valid relationships
   return exhibitions
     .filter(exhibition => 
       exhibition !== null && 
