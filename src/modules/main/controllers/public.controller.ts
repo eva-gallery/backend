@@ -4,20 +4,9 @@ import { PublicRepository, MAX_SEED } from '@modules/app-db/repositories';
 import { ArtworkId, ResourceId, UnityRoomId, ExhibitionId, Artwork } from '@modules/app-db/entities';
 import { HttpApiService } from '@modules/http-api';
 import { mapAsync } from '@common/helpers';
-import { AddArtworkLikeDto, ExhibitionDto } from '../contracts/public';
+import { AddArtworkLikeDto } from '../contracts/public';
 import { randomInt } from 'crypto';
 import * as mapper from '../contracts/public/mapper';
-
-interface ExtendedArtwork {
-  name: string;
-  slug: string;
-  imageFilename?: string;
-  thumbnailFilename?: string;
-}
-
-interface ExtendedExhibitionDto extends Omit<ExhibitionDto, 'artwork'> {
-  artwork: ExtendedArtwork;
-}
 
 @Controller('public')
 export class PublicController {
