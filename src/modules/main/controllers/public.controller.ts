@@ -199,7 +199,7 @@ async getArtistExhibitions(@Query('slug') slug: string) {
     return [];
   }
   
-  // Simply use the mapper without any modification
+  // Map using standard mapper, then add thumbnailFilename
   return exhibitions
     .filter(exhibition => 
       exhibition !== null && 
@@ -211,7 +211,28 @@ async getArtistExhibitions(@Query('slug') slug: string) {
       Array.isArray(exhibition.artworks) && 
       exhibition.artworks.length > 0
     )
-    .map(exhibition => mapper.createExhibitionDto(exhibition));
+    .map(exhibition => {
+      const dto = mapper.createExhibitionDto(exhibition);
+      
+      // Add the missing thumbnailFilename property to the artwork object
+      if (dto.artwork && exhibition.artworks && exhibition.artworks.length > 0) {
+        const artwork = exhibition.artworks[0];
+        
+        // Create a new artwork object with the added property
+        return {
+          ...dto,
+          artwork: {
+            ...dto.artwork,
+            thumbnailFilename: artwork.imageHash ? 
+              `${artwork.imageHash}.jpg` : undefined,
+            imageFilename: artwork.imageHash ? 
+              `${artwork.imageHash}.jpg` : undefined
+          }
+        };
+      }
+      
+      return dto;
+    });
 }
   
   @Get('resource/:id/content')
