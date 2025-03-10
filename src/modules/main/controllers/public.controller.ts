@@ -8,6 +8,17 @@ import { AddArtworkLikeDto } from '../contracts/public';
 import { randomInt } from 'crypto';
 import * as mapper from '../contracts/public/mapper';
 
+interface ExtendedArtwork {
+  name: string;
+  slug: string;
+  imageFilename?: string;
+  thumbnailFilename?: string;
+}
+
+interface ExtendedExhibitionDto extends Omit<ExhibitionDto, 'artwork'> {
+  artwork: ExtendedArtwork;
+}
+
 @Controller('public')
 export class PublicController {
 
@@ -199,7 +210,7 @@ async getArtistExhibitions(@Query('slug') slug: string) {
     return [];
   }
   
-  // Map exhibitions to DTOs with thumbnailFilename
+  // Transform to the extended DTO type
   return exhibitions
     .filter(exhibition => 
       exhibition !== null && 
@@ -212,17 +223,10 @@ async getArtistExhibitions(@Query('slug') slug: string) {
       exhibition.artworks.length > 0
     )
     .map(exhibition => {
+      // Use the standard mapper
       const dto = mapper.createExhibitionDto(exhibition);
       
-      // Make sure artwork with thumbnailFilename is included
-      if (dto.artwork && exhibition.artworks && exhibition.artworks.length > 0) {
-        const artwork = exhibition.artworks[0];
-        if (artwork.imageHash) {
-          // Add thumbnailFilename based on imageHash
-          dto.artwork.thumbnailFilename = `${artwork.imageHash}.jpg`;
-        }
-      }
-      
+      // Return as is - no need to modify
       return dto;
     });
 }
