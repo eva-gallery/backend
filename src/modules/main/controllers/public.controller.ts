@@ -199,7 +199,7 @@ async getArtistExhibitions(@Query('slug') slug: string) {
     return [];
   }
   
-  // Filter exhibitions with valid relationships
+  // Map exhibitions to DTOs with thumbnailFilename
   return exhibitions
     .filter(exhibition => 
       exhibition !== null && 
@@ -211,7 +211,20 @@ async getArtistExhibitions(@Query('slug') slug: string) {
       Array.isArray(exhibition.artworks) && 
       exhibition.artworks.length > 0
     )
-    .map(exhibition => mapper.createExhibitionDto(exhibition));
+    .map(exhibition => {
+      const dto = mapper.createExhibitionDto(exhibition);
+      
+      // Make sure artwork with thumbnailFilename is included
+      if (dto.artwork && exhibition.artworks && exhibition.artworks.length > 0) {
+        const artwork = exhibition.artworks[0];
+        if (artwork.imageHash) {
+          // Add thumbnailFilename based on imageHash
+          dto.artwork.thumbnailFilename = `${artwork.imageHash}.jpg`;
+        }
+      }
+      
+      return dto;
+    });
 }
   
   @Get('resource/:id/content')
