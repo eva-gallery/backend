@@ -215,7 +215,12 @@ async getArtistExhibitions(@Query('slug') slug: string) {
       const dto = mapper.createExhibitionDto(exhibition);
       
       // Add the missing thumbnailFilename property to the artwork object
-      if (dto.artwork && exhibition.artworks && exhibition.artworks.length > 0) {
+      if (dto.artwork !== null && 
+          dto.artwork !== undefined && 
+          exhibition.artworks !== null && 
+          exhibition.artworks !== undefined && 
+          exhibition.artworks.length > 0) {
+        
         const artwork = exhibition.artworks[0];
         
         // Create a new artwork object with the added property
@@ -223,10 +228,12 @@ async getArtistExhibitions(@Query('slug') slug: string) {
           ...dto,
           artwork: {
             ...dto.artwork,
-            thumbnailFilename: artwork.imageHash ? 
-              `${artwork.imageHash}.jpg` : undefined,
-            imageFilename: artwork.imageHash ? 
-              `${artwork.imageHash}.jpg` : undefined
+            thumbnailFilename: artwork.imageHash !== null && 
+                               artwork.imageHash !== undefined ? 
+                               `${artwork.imageHash}.jpg` : undefined,
+            imageFilename: artwork.imageHash !== null && 
+                           artwork.imageHash !== undefined ? 
+                           `${artwork.imageHash}.jpg` : undefined
           }
         };
       }
