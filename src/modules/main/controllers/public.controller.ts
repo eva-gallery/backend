@@ -195,7 +195,6 @@ async getArtistExhibitions(@Query('slug') slug: string) {
   
   const exhibitions = await this.publicRepository.getArtistPublicExhibitions(labels[0], labels[1]);
   
-  // Make sure exhibitions array exists before mapping
   if (exhibitions === undefined || exhibitions === null || exhibitions.length === 0) {
     return [];
   }
@@ -212,7 +211,23 @@ async getArtistExhibitions(@Query('slug') slug: string) {
       Array.isArray(exhibition.artworks) && 
       exhibition.artworks.length > 0
     )
-    .map(exhibition => mapper.createExhibitionDto(exhibition));
+    .map(exhibition => {
+      // Get the first artwork for display
+      const artwork = exhibition.artworks[0];
+      
+      // Ensure imageHash is accessible for thumbnailFilename
+      if (artwork && artwork.imageHash) {
+        // The thumbnailFilename is derived from the imageHash in the entity or mapper
+        return mapper.createExhibitionDto(exhibition);
+      } else {
+        // If there's an issue with the artwork, we can still return the exhibition without art details
+        const exhibitionDto = mapper.createExhibitionDto(exhibition);
+        if (exhibitionDto.artwork) {
+          exhibitionDto.artwork.thumbnailFilename = null;
+        }
+        return exhibitionDto;
+      }
+    });
 }
   
   @Get('resource/:id/content')
