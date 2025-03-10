@@ -272,6 +272,10 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
   
   // Now, let's find all artworks by this artist
   const artworks = await this.artworks.find({
+    select: {
+      id: true,
+      imageHash: true  // Make sure we select imageHash
+    },
     where: {
       artist: { id: artist.id },
       public: true
@@ -283,7 +287,7 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
   }
   
   // Find all exhibitions that contain these artworks
-  return this.exhibitions.find({
+  const exhibitions = await this.exhibitions.find({
     relations: {
       gallery: { 
         user: true,
@@ -303,6 +307,23 @@ async getArtistPublicExhibitions(userLabel: string, artistLabel: string) {
       }
     }
   });
+  
+  // Ensure each exhibition's artworks have imageHash and thumbnailFilename
+  for (const exhibition of exhibitions) {
+    if (exhibition.artworks && exhibition.artworks.length > 0) {
+      for (const artwork of exhibition.artworks) {
+        // Make sure imageHash is available
+        if (!artwork.imageHash) {
+          const fullArtwork = artworks.find(a => a.id === artwork.id);
+          if (fullArtwork && fullArtwork.imageHash) {
+            artwork.imageHash = fullArtwork.imageHash;
+          }
+        }
+      }
+    }
+  }
+  
+  return exhibitions;
 }
   
   async getGalleryDetailBySlug(userLabel: string, galleryLabel: string) {
