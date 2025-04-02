@@ -1,4 +1,4 @@
-import { ValidationOptions, ValidationTypes, registerDecorator } from 'class-validator';
+import { ValidationOptions, ValidationTypes, registerDecorator, isUUID } from 'class-validator';
 
 export function AllowEmpty(validationOptions?: ValidationOptions) {
   return function(object: any, propertyName: string) {
@@ -15,4 +15,23 @@ export function AllowEmpty(validationOptions?: ValidationOptions) {
       ],
     });
   }
+}
+
+export function IsUUIDOrEmpty(validationOptions?: ValidationOptions) {
+  return function(object: any, propertyName: string) {
+    registerDecorator({
+      name: 'isUuidOrEmpty',
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any) {
+          return value === null || value === '' || isUUID(value);
+        },
+        defaultMessage() {
+          return `${propertyName} must be a UUID or empty`;
+        },
+      },
+    });
+  };
 }
