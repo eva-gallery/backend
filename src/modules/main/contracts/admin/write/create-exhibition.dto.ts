@@ -1,4 +1,4 @@
-import { IsString, IsBooleanString, IsOptional, IsUUID, IsDateString, IsArray } from 'class-validator';
+import { IsString, IsBooleanString, IsOptional, IsUUID, IsDateString, IsArray, ValidateIf } from 'class-validator';
 import { EMPTY, AllowEmpty } from '@common/helpers';
 import { GalleryId, ArtworkId, UnityRoomId } from '@modules/app-db/entities';
 
@@ -27,7 +27,7 @@ export class CreateExhibitionDto {
   @IsOptional()
   @ValidateIf(o => o.activeRoomId !== null && o.activeRoomId !== '')
   @IsUUID()
-  activeRoomId: UnityRoomId | null;
+  activeRoomId: UnityRoomId | EMPTY | null;
 
   @IsOptional()
   @AllowEmpty()
