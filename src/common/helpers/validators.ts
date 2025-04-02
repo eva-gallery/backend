@@ -25,11 +25,17 @@ export function IsUUIDOrEmpty(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any) {
-          return value === null || value === '' || isUUID(value);
+        validate(value: any, args: ValidationArguments) {
+          console.log(`Validating ${propertyName}:`, value, 
+                     `Type: ${typeof value}`, 
+                     `isNull: ${value === null}`, 
+                     `isEmpty: ${value === ''}`);
+                     
+          return value === null || value === '' || value === undefined || isUUID(value);
         },
-        defaultMessage() {
-          return `${propertyName} must be a UUID or empty`;
+        defaultMessage(args: ValidationArguments) {
+          const value = args.value;
+          return `${propertyName} must be a UUID or empty (received: ${value}, type: ${typeof value})`;
         },
       },
     });
