@@ -26,8 +26,8 @@ export class CreateExhibitionDto {
 
   @IsOptional()
   @AllowEmpty()
-  @IsUUID()
-  activeRoomId: UnityRoomId | EMPTY;
+  @IsUUID(undefined, { each: false, always: false })
+  activeRoomId: UnityRoomId | EMPTY | null;
 
   @IsOptional()
   @AllowEmpty()
