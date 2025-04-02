@@ -25,9 +25,9 @@ export class CreateExhibitionDto {
   galleryId: GalleryId;
 
   @IsOptional()
-  @AllowEmpty()
-  @IsUUID(undefined, { each: false, always: false })
-  activeRoomId: UnityRoomId | EMPTY | null;
+  @ValidateIf(o => o.activeRoomId !== null && o.activeRoomId !== '')
+  @IsUUID()
+  activeRoomId: UnityRoomId | null;
 
   @IsOptional()
   @AllowEmpty()
