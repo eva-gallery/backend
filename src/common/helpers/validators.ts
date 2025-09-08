@@ -1,4 +1,4 @@
-import { ValidationOptions, ValidationTypes, ValidationArguments, registerDecorator, isUUID } from 'class-validator';
+import { ValidationOptions, ValidationTypes, registerDecorator, isUUID } from 'class-validator';
 
 export function AllowEmpty(validationOptions?: ValidationOptions) {
   return function(object: any, propertyName: string) {
